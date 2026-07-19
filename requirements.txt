@@ -1,0 +1,6 @@
+gradio
+groq
+google-genai
+Pillow
+python-dotenv
+gtts

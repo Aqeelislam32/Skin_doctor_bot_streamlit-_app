@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Skin Assistant — Portfolio Demo</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary": "#5b5f62",
+                    "tertiary-container": "#006476",
+                    "on-secondary-fixed-variant": "#43474a",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed-dim": "#c3c7ca",
+                    "on-primary-container": "#c4d2ff",
+                    "on-tertiary-container": "#70e2ff",
+                    "primary-fixed-dim": "#b2c5ff",
+                    "outline": "#737685",
+                    "on-secondary-container": "#5f6366",
+                    "secondary-fixed": "#e0e3e6",
+                    "on-tertiary-fixed": "#001f26",
+                    "tertiary": "#004b58",
+                    "surface-tint": "#0c56d0",
+                    "surface-container-high": "#e0e8ff",
+                    "on-surface-variant": "#434654",
+                    "on-error-container": "#93000a",
+                    "error": "#ba1a1a",
+                    "inverse-primary": "#b2c5ff",
+                    "surface-variant": "#d7e2ff",
+                    "inverse-on-surface": "#edf0ff",
+                    "outline-variant": "#c3c6d6",
+                    "tertiary-fixed-dim": "#5dd6f3",
+                    "secondary-container": "#dde0e3",
+                    "surface-container-highest": "#d7e2ff",
+                    "surface-dim": "#cadaff",
+                    "primary-fixed": "#dae2ff",
+                    "surface-container-low": "#f1f3ff",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed": "#adecff",
+                    "on-background": "#041b3c",
+                    "surface-container": "#e8edff",
+                    "inverse-surface": "#1d3052",
+                    "on-error": "#ffffff",
+                    "primary-container": "#0052cc",
+                    "error-container": "#ffdad6",
+                    "primary": "#003d9b",
+                    "on-primary-fixed": "#001848",
+                    "surface-bright": "#f9f9ff",
+                    "on-secondary-fixed": "#181c1e",
+                    "on-tertiary-fixed-variant": "#004e5d",
+                    "on-primary-fixed-variant": "#0040a2",
+                    "background": "#f9f9ff",
+                    "surface": "#f9f9ff",
+                    "on-tertiary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "on-surface": "#041b3c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-gap": "1rem",
+                    "section-padding": "1.5rem",
+                    "margin-page": "2rem",
+                    "gutter-grid": "1.5rem",
+                    "control-panel-width": "320px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Inter"],
+                    "data-display": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "data-display": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .clinical-card {
+            background-color: #ffffff;
+            border: 1px solid #E1E4E8;
+            border-radius: 16px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .clinical-card:hover {
+            box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.08);
+        }
+        .mic-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+        .mic-button {
+            z-index: 10;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .mic-button:active {
+            transform: scale(0.92);
+        }
+        .pulse-glow {
+            position: absolute;
+            inset: -10px;
+            border-radius: 9999px;
+            background: radial-gradient(circle, rgba(12, 86, 208, 0.2) 0%, transparent 70%);
+            animation: pulse-ring 2s infinite;
+            opacity: 0;
+        }
+        .mic-container:hover .pulse-glow {
+            opacity: 1;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1.3); opacity: 0; }
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c3c6d6; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-50 flex justify-between items-center w-full px-margin-page py-4 bg-surface dark:bg-surface-dim shadow-sm">
+<div class="flex items-center gap-3">
+<div class="bg-primary-container p-2 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+</div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">AI Skin Assistant — Portfolio Demo</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-surface-container-high transition-colors cursor-pointer active:scale-95">
+<span class="material-symbols-outlined text-on-surface-variant">account_circle</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container-high transition-colors cursor-pointer active:scale-95">
+<span class="material-symbols-outlined text-on-surface-variant">settings</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow grid grid-cols-1 md:grid-cols-[360px_1fr] gap-gutter-grid px-margin-page py-section-padding max-w-[1600px] mx-auto w-full">
+<!-- Left Column: Input Control -->
+<aside class="flex flex-col gap-6">
+<!-- Voice Recording Card -->
+<section class="clinical-card p-6 flex flex-col items-center text-center gap-4 relative overflow-hidden">
+<div class="w-full text-left">
+<h2 class="font-headline-md text-headline-md text-primary mb-1">Voice Recording</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Record symptoms or patient history orally.</p>
+</div>
+<div class="mic-container group flex items-center justify-center mt-4">
+<div class="pulse-glow"></div>
+<!-- Shader behind mic icon -->
+
+<button class="mic-button bg-primary text-white w-20 h-20 rounded-full flex items-center justify-center shadow-lg hover:bg-primary-container hover:text-on-primary-container transition-all relative z-20">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">mic</span>
+</button>
+</div>
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-widest mt-2">Tap to start recording</p>
+</section>
+<!-- Image Upload Card -->
+<section class="clinical-card p-6 flex flex-col gap-4">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary mb-1">Upload Skin Image</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">High-resolution dermatological scan required.</p>
+</div>
+<div class="border-2 border-dashed border-outline-variant rounded-xl p-8 flex flex-col items-center justify-center gap-4 bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="w-full h-40 bg-surface-container rounded-lg overflow-hidden relative border border-outline-variant">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" data-alt="A professional medical-grade close-up photograph of a skin sample on a neutral grey clinical background. The lighting is bright and even, mimicking a sterile laboratory environment. The image is crisp and detailed, showcasing the texture of healthy skin for comparison. The overall aesthetic is clinical, clean, and highly sophisticated in a professional medical dashboard style." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDh8G-sSRh9IbGtU4CZF2TicNPVR0drAaRuBShUzn87au8uzigh2aRwQlgDbVGC2wgA-Qn1xsPVMRp2gJJOA8mMO6ao0kc9zovABahpVQj2ISyqNAPUDVgi2AsOQeseaemBd27wDefgTxKrYwVEigALjIdeMtH4h8uAbASs5Kp-bMhwLxZGnTFEZvYPJH473Uxxkmd7ePsJ3GbxhCbmKiWRCxrTeQlk7AT-2Fr9Sz_I7uXW2LZijbtZ')">
+</div>
+<div class="absolute inset-0 bg-primary/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-primary text-4xl">add_a_photo</span>
+</div>
+</div>
+<div class="text-center">
+<p class="font-body-md text-body-md text-on-surface font-medium">Drag and drop scan here</p>
+<p class="font-label-sm text-label-sm text-secondary mt-1">Supports JPG, PNG, DICOM (Max 25MB)</p>
+</div>
+<button class="px-6 py-2 border border-primary text-primary font-body-md rounded-lg hover:bg-primary-container hover:text-on-primary-container transition-colors">
+                        Browse Files
+                    </button>
+</div>
+</section>
+<!-- Primary Action -->
+<button class="w-full bg-primary text-white py-4 rounded-xl font-headline-md flex items-center justify-center gap-3 shadow-md hover:bg-primary-container hover:text-on-primary-container active:scale-95 transition-all">
+<span class="material-symbols-outlined">analytics</span>
+                Analyze Now
+            </button>
+</aside>
+<!-- Right Column: Results Canvas -->
+<div class="flex flex-col gap-6">
+<!-- Speech-to-Text Results -->
+<section class="clinical-card p-6 flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">description</span>
+<h2 class="font-headline-md text-headline-md text-primary">Speech-to-Text</h2>
+</div>
+<span class="px-3 py-1 bg-surface-container-high text-primary rounded-full text-label-sm font-medium">Live Transcription</span>
+</div>
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-5 min-h-[120px] relative">
+<p class="text-on-surface-variant font-body-lg italic">Recognized speech will appear here...</p>
+<div class="absolute bottom-4 right-4 flex gap-2">
+<button class="p-2 text-secondary hover:text-primary transition-colors"><span class="material-symbols-outlined">content_copy</span></button>
+<button class="p-2 text-secondary hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+</div>
+</div>
+</section>
+<!-- AI Response / Analysis -->
+<section class="clinical-card p-0 flex flex-col h-full overflow-hidden">
+<div class="p-6 border-b border-outline-variant flex items-center justify-between bg-surface-bright">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<h2 class="font-headline-md text-headline-md text-primary">AI Diagnostic Analysis</h2>
+</div>
+<div class="flex gap-2">
+<span class="flex items-center gap-1 px-3 py-1 bg-tertiary-container text-on-tertiary-container rounded-full text-label-sm">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim animate-pulse"></span>
+                            AI Engine Online
+                        </span>
+</div>
+</div>
+<div class="p-8 flex-grow custom-scrollbar overflow-y-auto bg-white">
+<!-- Markdown-style content -->
+<div class="max-w-3xl space-y-8">
+<div class="border-l-4 border-primary pl-6 py-2 bg-surface-container-low rounded-r-lg">
+<h3 class="font-headline-md text-headline-md text-primary mb-2">Analysis Highlights</h3>
+<p class="font-body-lg text-body-lg text-on-surface leading-relaxed">
+                                Upload a patient scan and provide a voice description to begin the deep-learning analysis. Our neural networks are trained on over 500,000 clinical dermatological cases to identify patterns with high precision.
+                            </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="p-5 rounded-xl bg-surface-container border border-outline-variant">
+<div class="flex items-center gap-2 mb-3 text-primary">
+<span class="material-symbols-outlined">science</span>
+<span class="font-bold text-label-sm uppercase tracking-wider">Potential Findings</span>
+</div>
+<ul class="space-y-2 font-body-md text-on-surface-variant">
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[18px] mt-0.5 text-secondary">check_circle</span>
+                                        Morphology analysis pending...
+                                    </li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[18px] mt-0.5 text-secondary">check_circle</span>
+                                        Vascular pattern detection...
+                                    </li>
+</ul>
+</div>
+<div class="p-5 rounded-xl bg-surface-container border border-outline-variant">
+<div class="flex items-center gap-2 mb-3 text-secondary">
+<span class="material-symbols-outlined">priority_high</span>
+<span class="font-bold text-label-sm uppercase tracking-wider">Confidence Score</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex-grow bg-outline-variant h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[0%]" id="confidence-bar"></div>
+</div>
+<span class="font-data-display text-primary text-headline-md">--%</span>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<h4 class="font-headline-md text-headline-md text-on-surface">Next Steps Recommended</h4>
+<div class="grid grid-cols-1 gap-3">
+<div class="flex items-center gap-4 p-4 rounded-lg hover:bg-surface-container-low transition-colors border border-transparent hover:border-outline-variant group">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">history_edu</span>
+</div>
+<div>
+<p class="font-body-lg font-semibold">Generate Clinical Report</p>
+<p class="font-label-sm text-secondary">Export structured documentation for EMR integration.</p>
+</div>
+<span class="material-symbols-outlined ml-auto text-outline-variant">chevron_right</span>
+</div>
+<div class="flex items-center gap-4 p-4 rounded-lg hover:bg-surface-container-low transition-colors border border-transparent hover:border-outline-variant group">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">zoom_in</span>
+</div>
+<div>
+<p class="font-body-lg font-semibold">Detailed Differential Diagnosis</p>
+<p class="font-label-sm text-secondary">View comparative cases from our clinical database.</p>
+</div>
+<span class="material-symbols-outlined ml-auto text-outline-variant">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="p-4 bg-surface-container-low border-t border-outline-variant flex justify-between items-center px-6">
+<span class="font-label-sm text-secondary">Last analysis: Never</span>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-4 py-2 font-body-md text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">share</span>
+                            Share
+                        </button>
+<button class="flex items-center gap-2 px-4 py-2 font-body-md text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">print</span>
+                            Print
+                        </button>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full bg-surface-bright dark:bg-surface-container-low border-t border-outline-variant py-8 mt-12">
+<div class="max-w-[1600px] mx-auto px-margin-page flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+<div class="max-w-2xl">
+<p class="font-label-sm text-label-sm text-on-secondary-fixed-variant leading-relaxed">
+                    © 2024 AI Skin Assistant. Medical Disclaimer: This tool is for informational purposes only and does not replace professional medical advice, diagnosis, or treatment.
+                </p>
+</div>
+<nav class="flex gap-6">
+<a class="font-label-sm text-label-sm text-on-secondary-fixed-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-secondary-fixed-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-on-secondary-fixed-variant hover:text-primary transition-colors" href="#">Contact Support</a>
+</nav>
+</div>
+</footer>
+<script>
+        // Micro-interactions for demonstration
+        const micBtn = document.querySelector('.mic-button');
+        const confidenceBar = document.getElementById('confidence-bar');
+        const analyzeBtn = document.querySelector('button.bg-primary.text-white.py-4');
+        
+        let isRecording = false;
+
+        micBtn.addEventListener('click', () => {
+            isRecording = !isRecording;
+            if(isRecording) {
+                micBtn.classList.remove('bg-primary');
+                micBtn.classList.add('bg-error');
+                micBtn.querySelector('span').textContent = 'stop';
+            } else {
+                micBtn.classList.remove('bg-error');
+                micBtn.classList.add('bg-primary');
+                micBtn.querySelector('span').textContent = 'mic';
+            }
+        });
+
+        analyzeBtn.addEventListener('click', () => {
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Processing...';
+            
+            setTimeout(() => {
+                confidenceBar.style.width = '94%';
+                confidenceBar.classList.add('transition-all', 'duration-1000');
+                document.querySelector('.font-data-display').textContent = '94%';
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Analysis Complete';
+                analyzeBtn.classList.replace('bg-primary', 'bg-tertiary-container');
+                
+                setTimeout(() => {
+                    analyzeBtn.classList.replace('bg-tertiary-container', 'bg-primary');
+                    analyzeBtn.innerHTML = '<span class="material-symbols-outlined">analytics</span> Analyze Now';
+                }, 3000);
+            }, 1500);
+        });
+    </script>
+</body></html>
