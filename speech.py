@@ -1,24 +1,19 @@
 import os
-from dotenv import load_dotenv
 from groq import Groq
 
-load_dotenv()
 
+def transcribe_audio(audio_path):
+    api_key = os.getenv("GROQ_API_KEY")
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+    if not api_key:
+        raise ValueError("GROQ_API_KEY not found.")
 
+    client = Groq(api_key=api_key)
 
-def transcribe_audio(audio_path: str) -> str:
-    """
-    Convert a recorded voice message into text using Groq's hosted Whisper model.
-    audio_path: local path to the recorded audio file (wav/mp3/m4a etc.)
-    """
-    with open(audio_path, "rb") as f:
+    with open(audio_path, "rb") as file:
         transcription = client.audio.transcriptions.create(
-            file=f,
-            model="whisper-large-v3-turbo",
-            response_format="text",
-            # language="ur"  # uncomment and set if you want to force a language
+            file=(audio_path, file.read()),
+            model="whisper-large-v3"
         )
-    # response_format="text" already returns a plain string
-    return transcription.strip() if isinstance(transcription, str) else str(transcription)
+
+    return transcription.text
