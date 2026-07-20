@@ -198,7 +198,7 @@ with st.sidebar:
         st.rerun()
 
     st.markdown("---")
-    st.subheader("Yeh App Kaise Kaam Karta Hai:")
+    st.subheader("How This App Works:")
     st.markdown("""
     1.  **Groq (Voice-to-Text)**: Your voice recording is converted into text using Groq's ultra-fast Whisper speech-to-text model.
     2.  **Gemini (Image Analysis)**: Your uploaded image and text description are analyzed using Google's Gemini AI model, which provides insights into the detected skin condition.
