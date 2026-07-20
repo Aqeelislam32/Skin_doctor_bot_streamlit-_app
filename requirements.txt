@@ -4,4 +4,6 @@ google-genai
 Pillow
 streamlit-audiorec
 python-dotenv
+google-generativeai
+google-api-core
 gtts
