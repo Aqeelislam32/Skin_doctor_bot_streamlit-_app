@@ -110,6 +110,12 @@ body {
     width: 100%;
     box-shadow: var(--shadow);
 }
+.stButton>button:hover {
+    background: #1D4ED8; /* Darker Blue on hover */
+}
+[data-testid="stSidebar"] .stButton>button:hover {
+    background: #DC2626 !important; /* Red on hover for sidebar buttons */
+}
 
 /* Override for Streamlit's info box to match card style */
 .st-emotion-cache-1wmy9hl {
@@ -155,6 +161,8 @@ if 'transcript' not in st.session_state:
     st.session_state.transcript = "Your transcribed voice note will appear here."
 if 'audio_response' not in st.session_state:
     st.session_state.audio_response = None
+if 'keys_deleted' not in st.session_state:
+    st.session_state.keys_deleted = False
 
 # --- SIDEBAR ---
 with st.sidebar:
@@ -162,8 +170,13 @@ with st.sidebar:
     st.markdown("Enter your API keys here.")
 
     # Load keys from environment to pre-fill, but prioritize user input
-    groq_api_key_env = os.getenv("GROQ_API_KEY", "")
-    gemini_api_key_env = os.getenv("GEMINI_API_KEY", "")
+    # If user clicked delete, keep the fields empty
+    if st.session_state.keys_deleted:
+        groq_api_key_env = ""
+        gemini_api_key_env = ""
+    else:
+        groq_api_key_env = os.getenv("GROQ_API_KEY", "")
+        gemini_api_key_env = os.getenv("GEMINI_API_KEY", "")
 
     groq_api_key = st.text_input("Groq API Key", type="password", value=groq_api_key_env, help="Aap apni key yahan se le sakte hain: https://console.groq.com/keys")
     gemini_api_key = st.text_input("Gemini API Key", type="password", value=gemini_api_key_env, help="Aap apni key yahan se le sakte hain: https://aistudio.google.com/app/apikey")
@@ -173,6 +186,16 @@ with st.sidebar:
         os.environ["GROQ_API_KEY"] = groq_api_key
     if gemini_api_key:
         os.environ["GEMINI_API_KEY"] = gemini_api_key
+        st.session_state.keys_deleted = False # Reset if user enters a key
+
+    if st.button("Delete API Keys", use_container_width=True):
+        if "GROQ_API_KEY" in os.environ:
+            del os.environ["GROQ_API_KEY"]
+        if "GEMINI_API_KEY" in os.environ:
+            del os.environ["GEMINI_API_KEY"]
+        st.session_state.keys_deleted = True
+        st.success("API keys have been cleared for this session.")
+        st.rerun()
 
     st.markdown("---")
     st.subheader("Yeh App Kaise Kaam Karta Hai:")
