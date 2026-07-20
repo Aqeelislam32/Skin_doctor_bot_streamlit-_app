@@ -1,14 +1,16 @@
 import os
 from datetime import datetime
 import streamlit as st
-from st_audiorec import st_audiorec
-from dotenv import load_dotenv
 from speech import transcribe_audio
 from vision import analyze_skin
 from tts import text_to_speech
 from utils import ensure_uploads_dir
+from st_audiorec import st_audiorec
 import asyncio
 import sys
+from dotenv import load_dotenv
+from google.api_core import exceptions as google_exceptions
+from groq import APIError
 
 load_dotenv()
 UPLOAD_DIR = ensure_uploads_dir("uploads")
@@ -118,6 +120,11 @@ body {
 .st-emotion-cache-1wmy9hl .stMarkdown p {
     color: #111827 !important;
 }
+
+/* Sidebar Styles */
+[data-testid="stSidebar"] {
+    background-color: #F3F4F6 !important; /* Sky Blue */
+}
 """
 
 def format_analysis_html(response_text: str) -> str:
@@ -148,6 +155,34 @@ if 'transcript' not in st.session_state:
     st.session_state.transcript = "Your transcribed voice note will appear here."
 if 'audio_response' not in st.session_state:
     st.session_state.audio_response = None
+
+# --- SIDEBAR ---
+with st.sidebar:
+    st.header("API Configuration")
+    st.markdown("Enter your API keys here.")
+
+    # Load keys from environment to pre-fill, but prioritize user input
+    groq_api_key_env = os.getenv("GROQ_API_KEY", "")
+    gemini_api_key_env = os.getenv("GEMINI_API_KEY", "")
+
+    groq_api_key = st.text_input("Groq API Key", type="password", value=groq_api_key_env, help="Aap apni key yahan se le sakte hain: https://console.groq.com/keys")
+    gemini_api_key = st.text_input("Gemini API Key", type="password", value=gemini_api_key_env, help="Aap apni key yahan se le sakte hain: https://aistudio.google.com/app/apikey")
+
+    # Set keys as environment variables for other modules to use
+    if groq_api_key:
+        os.environ["GROQ_API_KEY"] = groq_api_key
+    if gemini_api_key:
+        os.environ["GEMINI_API_KEY"] = gemini_api_key
+
+    st.markdown("---")
+    st.subheader("Yeh App Kaise Kaam Karta Hai:")
+    st.markdown("""
+    1.  **Groq (Voice-to-Text)**: Your voice recording is converted into text using Groq's ultra-fast Whisper speech-to-text model.
+    2.  **Gemini (Image Analysis)**: Your uploaded image and text description are analyzed using Google's Gemini AI model, which provides insights into the detected skin condition.
+
+    3.  **gTTS (Text-to-Speech)**: The AI's response is converted into natural-sounding audio, allowing you to listen to the results.
+
+    """)
 
 # --- UI LAYOUT ---
 
@@ -285,7 +320,10 @@ with col2:
 
 # --- BACKEND LOGIC ---
 if analyze_button:
-    if uploaded_image is None:
+    # Check for API keys before proceeding
+    if not os.getenv("GROQ_API_KEY") or not os.getenv("GEMINI_API_KEY"):
+        st.warning("Kripya sidebar mein Groq aur Gemini API keys enter karein.")
+    elif uploaded_image is None:
         st.warning("Please upload a skin image first.")
     else:
         with st.spinner("Analyzing... This may take a moment."):
@@ -301,8 +339,12 @@ if analyze_button:
                         f.write(audio_bytes)
                     patient_text = transcribe_audio(audio_path)
                     st.session_state.transcript = patient_text
+                except APIError as e:
+                    st.error(f"Groq (Voice-to-Text) API Error: {e.message}")
+                    st.warning("Aapki voice transcribe nahi ho saki. Shayad API key galat hai ya uski limit khatam ho gayi hai. Kripya sidebar mein check karein.")
+                    st.session_state.transcript = "Voice transcription failed due to API error."
                 except Exception as e:
-                    st.warning(f"Voice transcription failed, using typed text if available. ({e})")
+                    st.warning(f"Voice transcription fail ho gayi. Agar aapne text type kiya hai to use istemal kiya jayega. ({e})")
                     st.session_state.transcript = "Voice transcription failed."
 
             if not patient_text and typed_text:
@@ -320,8 +362,16 @@ if analyze_button:
                 audio_out_path = text_to_speech(ai_response, out_path=os.path.join(UPLOAD_DIR, "response.mp3"))
                 st.session_state.audio_response = audio_out_path
 
+            except google_exceptions.PermissionDenied as e:
+                st.error("Gemini API Error: Invalid API Key (401 UNAUTHENTICATED).")
+                st.warning("Aapki Gemini API key galat hai ya sahi se load nahi hui. Kripya sidebar mein sahi key enter karein.")
+                st.session_state.analysis = "Error: Invalid Gemini API Key."
+            except google_exceptions.ResourceExhausted as e:
+                st.error("Gemini API Error: Quota Exceeded.")
+                st.warning("Aapki Gemini API key ki free limit shayad khatam ho gayi hai. Kripya nayi key istemal karein.")
+                st.session_state.analysis = "Error: Gemini API quota exceeded."
             except Exception as e:
-                st.error(f"An error occurred during analysis: {e}")
+                st.error(f"Analysis ke dauran ek error aayi: {e}")
                 st.session_state.analysis = f"Error during analysis: {e}"
 
         st.rerun()
