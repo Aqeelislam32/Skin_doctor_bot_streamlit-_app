@@ -2,5 +2,6 @@ gradio
 groq
 google-genai
 Pillow
+streamlit-audiorec
 python-dotenv
 gtts
